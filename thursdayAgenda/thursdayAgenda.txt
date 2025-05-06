@@ -1,0 +1,189 @@
+🧭 Workshop – 🚀 Lektion torsdag 15 maj – JWT Middleware, Skydda routes & bcrypt 
+
+📌 Lektionsmål
+
+Efter lektionen ska studenterna:
+
+Förstå och kunna implementera middleware för JWT-verifiering.
+
+Kunna skydda API-routes med JWT-middleware.
+
+Kunna använda bcrypt för säker hantering och lagring av lösenord.
+
+Förstå varför lösenord aldrig ska sparas i klartext.
+
+-----------------------------
+📝 Tidsplanering (5 timmar)
+
+09.00–09.30	🧠 Veckans quiz (t.ex. Google Forms)
+09.30–10.00	📊 Mentimeter – Diskussionsfrågor om säkerhet, lösenord & tokens
+10.00–10.30	🎓 PowerPoint & teori: Middleware & bcrypt
+10.30–11.45	💻 Code-Along: JWT-middleware + bcrypt
+11.45–12.15	🔁 Reflektion (i par eller breakout-rooms) – se frågor nedan
+12.15–13.00	🍽️ Lunch
+13.00–14.00	🧠 Par/MObb koda övningarna: Implementera JWT & bcrypt 
+
+-----------------------------
+🎓 PowerPoint – Innehåll & Slides:
+
+Slide 1 – Innehåll (Introduktion)
+
+Middleware för JWT
+
+Skydda routes med JWT
+
+Varför lösenordshashing (bcrypt)?
+
+Talarmanus:
+"Idag ska vi fokusera på hur vi praktiskt kan skydda våra API-routes med JWT och middleware, samt hur vi hanterar lösenord på ett säkert sätt med bcrypt."
+
+-----------------------------
+-----------------------------
+-----------------------------
+Slide 2 – JWT Middleware
+
+Middleware kontrollerar JWT-token vid varje request.
+
+Varför middleware är smidigt och effektivt.
+
+Talarmanus:
+"En middleware är en funktion som körs innan våra route-handlers. Vi kan använda middleware för att kontrollera att användaren är autentiserad innan hen får åtkomst."
+
+-----------------------------
+Slide 3 – Middleware exempel
+
+function verifyJWT(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: "JWT-token saknas." });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
+    if (err) return res.status(403).json({ error: "JWT-token är ogiltig." });
+    req.user = payload; 
+    next();
+  });
+}
+
+app.get("/protected", verifyJWT, (req, res) => {
+  res.json({ user: req.user });
+});
+
+Talarmanus:
+"Här ser ni hur vi praktiskt implementerar JWT-middleware i Express. Alla skyddade routes kan nu enkelt använda verifyJWT för att kontrollera token innan åtkomst ges."
+
+-----------------------------
+Slide 4 – Varför lösenordshashing (bcrypt)?
+
+Lösenord får ALDRIG sparas i klartext.
+
+bcrypt skyddar lösenord med hashing.
+
+Talarmanus:
+"Att spara lösenord i klartext är väldigt osäkert. bcrypt hjälper oss att lagra lösenord som säkra hashes, vilket gör lösenorden mycket svåra att knäcka vid intrång."
+
+-----------------------------
+Slide 5 – bcrypt.js exempel
+
+import bcrypt from 'bcrypt';
+
+// Hasha lösenord
+const hashedPassword = await bcrypt.hash("lösenord123", 10);
+
+// Kontrollera lösenord
+const match = await bcrypt.compare("lösenord123", hashedPassword);
+
+Talarmanus:
+"Med bcrypt kan vi hash:a lösenord enkelt med funktionen .hash() och sedan kontrollera lösenord med .compare()."
+
+-----------------------------
+Slide 6 – Hashing & Saltning
+Talarmanus:
+
+”När vi sparar lösenord måste vi skydda dem ordentligt. Genom hashning gör vi lösenorden svåra att knäcka, och med saltning lägger vi till ett ytterligare skydd. bcrypt hanterar både hashning och saltning åt oss automatiskt."
+
+-----------------------------
+-----------------------------
+-----------------------------
+💻 Code-Along: JWT middleware & bcrypt
+
+📦 Installation:
+npm install express jsonwebtoken dotenv bcrypt
+
+🗃️ Struktur:
+projekt/
+├── middleware/
+│   └── verifyJWT.js
+├── .env
+├── package.json
+└── server.js
+
+📄 .env fil:
+JWT_SECRET=hemligkod123
+
+📄 verify.JWTCA.js 
+
+genomför den koden
+
+📄 server.js 
+
+genomför den koden
+
+-----------------------------
+-----------------------------
+-----------------------------
+🧪 Testa med Postman
+
+🔧 Starta servern
+node server.js
+
+Testa API:t i Postman:
+2. Registrera en ny användare
+POST: http://localhost:8080/register
+
+Body (JSON):
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+3. Logga in (få JWT-token)
+POST: http://localhost:8080/login
+
+Body (JSON):
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+Spara JWT-token från responsen
+{ "token": "din.token.här" }
+
+4. Skyddad route (med token)
+GET: http://localhost:8080/protected
+
+Headers:
+Authorization: Bearer din.token.här
+
+Testa utan token (får statuskod 401).
+
+Testa felaktig token (får statuskod 403).
+
+-----------------------------
+-----------------------------
+-----------------------------
+🧠 Reflektionsfrågor avslutning
+
+- Varför räcker det inte att bara logga in – varför behöver vi skydda routes?
+
+- Vad är skillnaden mellan att verifiera lösenord via bcrypt.compare() och bara jämföra strängar?
+
+- Vad händer om någon stjäl JWT-token från localStorage?
+
+- Hur kan vi som utvecklare minimera risken för dataläckor i API:er?
+
+- Vad tycker du känns mest osäkert i dagens API-flöden – och vad kan man göra åt det?
+
+-----------------------------
+-----------------------------
+-----------------------------
+Dags för övningar
