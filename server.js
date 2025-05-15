@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
+import verifyJWT from "./middleware/verifyJWT.js";
+
 const app = express();
 app.use(express.json());
 
@@ -48,8 +50,21 @@ app.post("/login", async (req, res) => {
   res.json({ token });
 });
 
-// En skydda route
+// En skydda route, som kräver en giltigt JWT-token
+app.get("/protected", verifyJWT, (req, res) => {
+  res.json({
+    message: `Välkommen till den skyddade routen/sidan ${req.user.username}!`,
+  });
+});
 
 // En public route
+app.get("/public", (req, res) => {
+  res.json({
+    message: `Välkommen till den publika routen/sidan!`,
+  });
+});
 
 // Lyssna på servern
+app.listen(5454, () => {
+  console.log("servern körs http://localhost:5454");
+});

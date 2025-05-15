@@ -4,8 +4,9 @@ dotenv.config();
 
 // Midleware för att verifiera JWT-token
 
-export default function verifyJW(req, res, next) {
-  const authHeader = req.header.authorization;
+export default function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  //   const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
     return res.status(401).json({ error: "JWT-token saknas." });
@@ -15,7 +16,7 @@ export default function verifyJW(req, res, next) {
 
   jwt.verify(token, process.env.JWT_SECRET, (error, payload) => {
     // Om verifieringen misslyckas
-    if (err) {
+    if (error) {
       return res
         .status(403)
         .json({ error: "JWT-token är ogiltig eller har gått ur." });
